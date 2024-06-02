@@ -8,8 +8,7 @@ class Token:
 
     def __repr__(self):
         return f"Token({self.type}, {self.value})"
-
-
+    
 class Lexer:
     def __init__(self, code):
         self.code = code
@@ -34,20 +33,20 @@ class Lexer:
         return self.tokens
 
 
-def main(file_path):
-    with open(file_path, 'r') as file:
-        code = file.read()
+# def main(file_path):
+#     with open(file_path, 'r') as file:
+#         code = file.read()
 
-    lexer = Lexer(code)
-    tokens = lexer.tokenize()
+#     lexer = Lexer(code)
+#     tokens = lexer.tokenize()
 
-    for token in tokens:
-        print(token)
+#     for token in tokens:
+#         print(token)
 
 
-if __name__ == "__main__":
-    import sys
-    if len(sys.argv) != 2:
-        print("Usage: python lexer.py <file_path>")
-    else:
-        main(sys.argv[1])
+# if __name__ == "__main__":
+#     import sys
+#     if len(sys.argv) != 2:
+#         print("Usage: python lexer.py <file_path>")
+#     else:
+#         main(sys.argv[1])
