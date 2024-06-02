@@ -14,7 +14,7 @@ Este proyecto implementa un analizador léxico para el lenguaje de programación
 ## Descarga e Instalación
 
 1. **Clonar el repositorio:**
-   `[git clone <URL_DEL_REPOSITORIO>](https://github.com/xJDvm/Analizador-PythonToJS.git)`
+   `[git clone https://github.com/xJDvm/Analizador-PythonToJS.git`
 
 2. **Instalar las dependencias:**
        `sudo apt-get update`
