@@ -25,7 +25,7 @@ Este proyecto implementa un analizador léxico para el lenguaje de programación
    `python main.py`
    
 ## Autores
-*Juan D. Valdes*
+*Juan D. Valdes*,
 *Maria Chang*
 
 
