@@ -1,6 +1,7 @@
 import re
 from token_1 import token_specification
 
+
 class Token:
     def __init__(self, type, value):
         self.type = type
@@ -8,7 +9,8 @@ class Token:
 
     def __repr__(self):
         return f"Token({self.type}, {self.value})"
-    
+
+
 class Lexer:
     def __init__(self, code):
         self.code = code
@@ -16,14 +18,16 @@ class Lexer:
         self.current_pos = 0
 
     def tokenize(self):
-        patterns = '|'.join(f'(?P<{name}>{pattern})' for name, pattern in token_specification)
+        patterns = '|'.join(
+            f'(?P<{name}>{pattern})' for name, pattern in token_specification)
         token_regex = re.compile(patterns)
 
         for match in re.finditer(token_regex, self.code):
             kind = match.lastgroup
             value = match.group(kind)
 
-            if kind == 'WHITESPACE' or kind == 'NEWLINE':
+            if kind == 'COMMENT':
+                # Ignore the full line of code that contains the comment symbols
                 continue
             elif kind == 'MISMATCH':
                 raise SyntaxError(f'Unexpected character: {value}')
