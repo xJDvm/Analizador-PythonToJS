@@ -26,7 +26,7 @@ class Lexer:
             kind = match.lastgroup
             value = match.group(kind)
 
-            if kind == 'COMMENT':
+            if kind == 'COMMENT' | kind == 'WHITESPACE' | kind == 'NEWLINE':
                 # Ignore the full line of code that contains the comment symbols
                 continue
             elif kind == 'MISMATCH':
