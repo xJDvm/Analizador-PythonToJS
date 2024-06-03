@@ -27,6 +27,6 @@ Este proyecto implementa un analizador léxico para el lenguaje de programación
 ## Autores
 *Juan D. Valdes*,
 *Maria Chang*
-
+*Jennire Vetri*
 
      
