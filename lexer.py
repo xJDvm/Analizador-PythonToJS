@@ -1,56 +1,25 @@
-import re
-from token_1 import token_specification
+# Importa la librería os, que permite interactuar con el sistema operativo
+import os
 
+# Función que recorre recursivamente todos los archivos y directorios en una ruta dada
+def recorrer_directorios(ruta):
+    # Recorre la lista de nombres en la ruta dada
+    for nombre in os.listdir(ruta):
+        # Crea una ruta completa combinando la ruta base y el nombre del archivo/directorio
+        ruta_completa = os.path.join(ruta, nombre)
+        
+        # Verifica si la ruta completa es un directorio
+        if os.path.isdir(ruta_completa):
+            # Si es un directorio, imprime el nombre del directorio
+            print(f"Directorio: {ruta_completa}")
+            # Llama a la función recursivamente para recorrer el subdirectorio
+            recorrer_directorios(ruta_completa)
+        else:
+            # Si es un archivo, imprime el nombre del archivo
+            print(f"Archivo: {ruta_completa}")
 
-class Token:
-    def __init__(self, type, value):
-        self.type = type
-        self.value = value
+# Especifica la ruta inicial desde donde se comenzará a recorrer
+ruta_inicial = "/ruta/a/tu/directorio"
 
-    def __repr__(self):
-        return f"Token({self.type}, {self.value})"
-
-
-class Lexer:
-    def __init__(self, code):
-        self.code = code
-        self.tokens = []
-        self.current_pos = 0
-
-    def tokenize(self):
-        patterns = '|'.join(
-            f'(?P<{name}>{pattern})' for name, pattern in token_specification)
-        token_regex = re.compile(patterns)
-
-        for match in re.finditer(token_regex, self.code):
-            kind = match.lastgroup
-            value = match.group(kind)
-
-            if kind == 'COMMENT' or kind == 'WHITESPACE' or kind == 'NEWLINE':
-                # Ignore the full line of code that contains the comment symbols
-                continue
-            elif kind == 'MISMATCH':
-                raise SyntaxError(f'Unexpected character: {value}')
-            else:
-                self.tokens.append(Token(kind, value))
-
-        return self.tokens
-
-
-# def main(file_path):
-#     with open(file_path, 'r') as file:
-#         code = file.read()
-
-#     lexer = Lexer(code)
-#     tokens = lexer.tokenize()
-
-#     for token in tokens:
-#         print(token)
-
-
-# if __name__ == "__main__":
-#     import sys
-#     if len(sys.argv) != 2:
-#         print("Usage: python lexer.py <file_path>")
-#     else:
-#         main(sys.argv[1])
+# Llama a la función para comenzar a recorrer desde la ruta inicial
+recorrer_directorios(ruta_inicial)
