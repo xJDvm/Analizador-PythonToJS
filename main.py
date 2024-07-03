@@ -3,7 +3,7 @@ from tkinter import filedialog, ttk, messagebox, Toplevel
 from lexer import Lexer
 import esprima
 import json
-
+import subprocess
 
 class MainApp:
     def __init__(self, root):
@@ -54,16 +54,6 @@ class MainApp:
         self.tree.heading("Token", text="Token")
         self.tree.pack(pady=10, fill=tk.BOTH, expand=True)
 
-        # self.scrollbar_y = ttk.Scrollbar(
-        #     self.tree_frame, orient="vertical", command=self.tree.yview)
-        # self.scrollbar_y.pack(side=tk.RIGHT, fill=tk.Y)
-        # self.tree.configure(yscroll=self.scrollbar_y.set)
-
-        # self.scrollbar_x = ttk.Scrollbar(
-        #     self.tree_frame, orient="horizontal", command=self.tree.xview)
-        # self.scrollbar_x.pack(side=tk.BOTTOM, fill=tk.X)
-        # self.tree.configure(xscroll=self.scrollbar_x.set)
-
         self.show_ast_button = tk.Button(self.button_frame, text="Mostrar AST", command=self.show_ast, font=(
             "Consolas", 12, "bold"), bg="#1C5560", fg="#D9D9D9", bd=0, padx=5, pady=5)
         self.show_ast_button.grid(row=0, column=2, padx=20)
@@ -78,7 +68,7 @@ class MainApp:
                 lexer = Lexer(code)
                 tokens = lexer.tokenize()
                 self.display_tokens(tokens)
-                self.ast = esprima.parseScript(code)
+                self.ast = esprima.parseScript(code, { "tolerant": True, "loc": True, "range": True })
             except SyntaxError as e:
                 messagebox.showerror("Error de Sintaxis", str(e))
 
@@ -93,13 +83,11 @@ class MainApp:
 
     def show_ast(self):
         if self.ast:
-            ast_window = Toplevel(self.root)
-            ast_window.title("Abstract Syntax Tree")
-            ast_window.geometry("600x400")
-            text_widget = tk.Text(ast_window, wrap="word")
-            text_widget.pack(expand=True, fill="both", padx=10, pady=10)
-            ast_str = str(self.ast)
-            text_widget.insert("1.0", ast_str)
+            try:
+                ast_json = json.dumps(self.ast, default=lambda o: o.__dict__, indent=4)
+                subprocess.run(["python", "arbol.py", ast_json])
+            except Exception as e:
+                messagebox.showerror("Error al mostrar AST", str(e))
         else:
             messagebox.showinfo(
                 "Información", "No hay un AST para mostrar. Por favor, cargue un archivo JavaScript primero.")
