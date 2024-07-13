@@ -1,1 +1,9 @@
-let bool = 5 < 10 && 2 >= 20 || true;
+let a = "hola" * 'hola';
+let g
+console.log(g);
+console.log(f);
+// hola
+/* 
+EEE
+
+*/
