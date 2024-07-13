@@ -22,94 +22,129 @@ def find_variable_declaration(identifier, ast):
     return False
 
 
+def esprima_node_to_dict(node):
+    if isinstance(node, esprima.nodes.Node):
+        node_dict = {"type": node.type}
+        for key, value in node.__dict__.items():
+            if key != 'type':
+                if isinstance(value, list):
+                    node_dict[key] = [
+                        esprima_node_to_dict(item) for item in value]
+                else:
+                    node_dict[key] = esprima_node_to_dict(value)
+        return node_dict
+    elif isinstance(node, list):
+        return [esprima_node_to_dict(item) for item in node]
+    else:
+        return node
+
+
+def esprima_ast_to_dict(ast):
+    return esprima_node_to_dict(ast)
+
+
+def collect_declarations(ast_node, declared_vars, semantic_errors):
+    if isinstance(ast_node, dict):
+        if ast_node.get('type') == 'VariableDeclarator':
+            var_name = ast_node['id']['name']
+            if var_name in declared_vars:
+                semantic_errors.append(f"Redeclared variable: {var_name}")
+            declared_vars.add(var_name)
+        for key, value in ast_node.items():
+            collect_declarations(value, declared_vars, semantic_errors)
+    elif isinstance(ast_node, list):
+        for item in ast_node:
+            collect_declarations(item, declared_vars, semantic_errors)
+
+
 def analyze_semantics(file_path):
     with open(file_path, 'r') as file:
         code = file.read()
-    # ast = esprima.parseScript(code)
-    ast = {
-        "type": "Program",
-        "sourceType": "script",
-        "body": [
-            {
-                "type": "VariableDeclaration",
-                "declarations": [
-                    {
-                        "type": "VariableDeclarator",
-                        "id": {
-                            "type": "Identifier",
-                            "name": "a"
-                        },
-                        "init": {
-                            "type": "BinaryExpression",
-                            "operator": "*",
-                            "left": {
-                                "type": "Literal",
-                                "value": "hola",
-                                "raw": "\"hola\""
-                            },
-                            "right": {
-                                "type": "Literal",
-                                "value": "hola",
-                                "raw": "'hola'"
-                            }
-                        }
-                    }
-                ],
-                "kind": "let"
-            },
-            {
-                "type": "ExpressionStatement",
-                "expression": {
-                    "type": "CallExpression",
-                    "callee": {
-                        "type": "MemberExpression",
-                        "computed": False,
-                        "object": {
-                            "type": "Identifier",
-                            "name": "console"
-                        },
-                        "property": {
-                            "type": "Identifier",
-                            "name": "log"
-                        }
-                    },
-                    "arguments": [
-                        {
-                            "type": "Identifier",
-                            "name": "g"
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+    esprima_output = esprima.parseScript(code)
+    ast = esprima_ast_to_dict(esprima_output)
     lexer = Lexer(code)
     lexer.tokenize()
     symbol_table = lexer.tokens
-    # print(ast)
-    # print()
-    # print(lexer)
-    # print()
-    # print(symbol_table)
 
     # Perform semantic analysis checks
     semantic_errors = []
 
     # Check for undefined variables
     for token in symbol_table:
-        # print(token)
         if token.type == 'IDENTIFIER':
             if not find_variable_declaration(token.value, ast):
                 semantic_errors.append(f"Undefined variable: {token.value}")
 
-    # Return True if no semantic errors found, False otherwise
+    # Check for redeclarations
+    declared_vars = set()
+    collect_declarations(ast, declared_vars, semantic_errors)
+
     print(semantic_errors)
     return not semantic_errors
 
+    # Return True if no semantic errors found, False otherwise
 
-# Usage example
+    # Usage example
 file_path = 'e2.js'
 if analyze_semantics(file_path):
     print("No semantic errors found.")
 else:
     print("Semantic errors detected.")
+
+    # ast = {
+    #     "type": "Program",
+    #     "sourceType": "script",
+    #     "body": [
+    #         {
+    #             "type": "VariableDeclaration",
+    #             "declarations": [
+    #                 {
+    #                     "type": "VariableDeclarator",
+    #                     "id": {
+    #                         "type": "Identifier",
+    #                         "name": "a"
+    #                     },
+    #                     "init": {
+    #                         "type": "BinaryExpression",
+    #                         "operator": "*",
+    #                         "left": {
+    #                             "type": "Literal",
+    #                             "value": "hola",
+    #                             "raw": "\"hola\""
+    #                         },
+    #                         "right": {
+    #                             "type": "Literal",
+    #                             "value": "hola",
+    #                             "raw": "'hola'"
+    #                         }
+    #                     }
+    #                 }
+    #             ],
+    #             "kind": "let"
+    #         },
+    #         {
+    #             "type": "ExpressionStatement",
+    #             "expression": {
+    #                 "type": "CallExpression",
+    #                 "callee": {
+    #                     "type": "MemberExpression",
+    #                     "computed": False,
+    #                     "object": {
+    #                         "type": "Identifier",
+    #                         "name": "console"
+    #                     },
+    #                     "property": {
+    #                         "type": "Identifier",
+    #                         "name": "log"
+    #                     }
+    #                 },
+    #                 "arguments": [
+    #                     {
+    #                         "type": "Identifier",
+    #                         "name": "g"
+    #                     }
+    #                 ]
+    #             }
+    #         }
+    #     ]
+    # }
