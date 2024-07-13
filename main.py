@@ -13,6 +13,7 @@ class MainApp:
         self.root.configure(bg="#D9D9D9")
         self.create_widgets()
         self.ast = None
+        self.syntax_error = ""
 
     def create_widgets(self):
         self.frame = tk.Frame(self.root, bg="#D9D9D9", padx=10, pady=10)
@@ -74,13 +75,15 @@ class MainApp:
         if file_path:
             with open(file_path, 'r') as file:
                 code = file.read()
-            try:
                 lexer = Lexer(code)
                 tokens = lexer.tokenize()
                 self.display_tokens(tokens)
-                self.ast = esprima.parseScript(code)
-            except SyntaxError as e:
-                messagebox.showerror("Error de Sintaxis", str(e))
+                try:
+                    self.ast = esprima.parseScript(code)
+                except esprima.error_handler.Error as e:
+                    self.syntax_error = f"Error de sintaxis: {e}"
+                    # print(f"Error de sintaxis: {e}")
+                    return
 
     def display_tokens(self, tokens):
         self.clear_table()
@@ -101,8 +104,12 @@ class MainApp:
             ast_str = str(self.ast)
             text_widget.insert("1.0", ast_str)
         else:
-            messagebox.showinfo(
-                "Información", "No hay un AST para mostrar. Por favor, cargue un archivo JavaScript primero.")
+            if self.syntax_error != "":
+                messagebox.showerror(
+                    "Análisis sintáctico fallido", self.syntax_error)
+            else:
+                messagebox.showinfo(
+                    "Información", "No hay un AST para mostrar. Por favor, cargue un archivo JavaScript primero.")
 
 
 if __name__ == "__main__":
