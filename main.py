@@ -81,7 +81,7 @@ class MainApp:
                 try:
                     self.ast = esprima.parseScript(code)
                 except esprima.error_handler.Error as e:
-                    self.syntax_error = f"Análisis sintáctico fallido: {e}"
+                    self.syntax_error = f"Error de sintaxis: {e}"
                     # print(f"Error de sintaxis: {e}")
                     return
 
@@ -106,7 +106,7 @@ class MainApp:
         else:
             if self.syntax_error != "":
                 messagebox.showerror(
-                    "Error de sintaxis", self.syntax_error)
+                    "Análisis sintáctico fallido", self.syntax_error)
             else:
                 messagebox.showinfo(
                     "Información", "No hay un AST para mostrar. Por favor, cargue un archivo JavaScript primero.")
