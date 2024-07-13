@@ -1,7 +1,7 @@
 token_specification = [
     # Numerical literals
     ('NUMBER',      r'\b\d+(\.\d*)?([eE][+-]?\d+)?\b'),
-    ('STRING',      r'"(?:\\.|[^"\\])*"'),      # String literals
+    ('STRING',      r'["\'](?:\\.|[^"\\])*["\']'),      # String literals
     # Identifiers (excluding reserved words)
     ('IDENTIFIER',
      r'(?!\b(?:if|else|while|for|function|var|let|const|return|abstract|arguments|await|boolean|break|byte|case|catch|char|class|continue|debugger|default|delete|do|double|enum|eval|export|extends|final|finally|float|goto|implements|import|in|instanceof|int|interface|long|native|new|package|private|protected|public|short|static|super|switch|synchronized|this|throw|throws|transient|try|typeof|void|volatile|with|yield)\b)\b[A-Za-z_]\w*\b'),
