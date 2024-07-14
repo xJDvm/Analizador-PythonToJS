@@ -3,6 +3,8 @@ from tkinter import filedialog, ttk, messagebox, Toplevel
 from lexer import Lexer
 import esprima
 import json
+from semantics import analyze_semantics  # Importa la función del archivo semantics.py
+
 
 
 class MainApp:
@@ -14,6 +16,7 @@ class MainApp:
         self.create_widgets()
         self.ast = None
         self.syntax_error = ""
+        self.file_path = None  # Variable para almacenar la ruta del archivo
 
     def create_widgets(self):
         self.frame = tk.Frame(self.root, bg="#D9D9D9", padx=10, pady=10)
@@ -55,25 +58,19 @@ class MainApp:
         self.tree.heading("Token", text="Token")
         self.tree.pack(pady=10, fill=tk.BOTH, expand=True)
 
-        # self.scrollbar_y = ttk.Scrollbar(
-        #     self.tree_frame, orient="vertical", command=self.tree.yview)
-        # self.scrollbar_y.pack(side=tk.RIGHT, fill=tk.Y)
-        # self.tree.configure(yscroll=self.scrollbar_y.set)
-
-        # self.scrollbar_x = ttk.Scrollbar(
-        #     self.tree_frame, orient="horizontal", command=self.tree.xview)
-        # self.scrollbar_x.pack(side=tk.BOTTOM, fill=tk.X)
-        # self.tree.configure(xscroll=self.scrollbar_x.set)
-
         self.show_ast_button = tk.Button(self.button_frame, text="Mostrar AST", command=self.show_ast, font=(
             "Consolas", 12, "bold"), bg="#1C5560", fg="#D9D9D9", bd=0, padx=5, pady=5)
         self.show_ast_button.grid(row=0, column=2, padx=20)
 
+        self.semantic_analysis_button = tk.Button(self.button_frame, text="Analizar Semántica", command=self.run_semantic_analysis, font=(
+            "Consolas", 12, "bold"), bg="#1C5560", fg="#D9D9D9", bd=0, padx=5, pady=5)
+        self.semantic_analysis_button.grid(row=0, column=3, padx=20)
+
     def load_file(self):
-        file_path = filedialog.askopenfilename(
+        self.file_path = filedialog.askopenfilename(
             filetypes=[("JavaScript Files", "*.js")])
-        if file_path:
-            with open(file_path, 'r') as file:
+        if self.file_path:
+            with open(self.file_path, 'r') as file:
                 code = file.read()
                 lexer = Lexer(code)
                 tokens = lexer.tokenize()
@@ -82,7 +79,6 @@ class MainApp:
                     self.ast = esprima.parseScript(code)
                 except esprima.error_handler.Error as e:
                     self.syntax_error = f"Error de sintaxis: {e}"
-                    # print(f"Error de sintaxis: {e}")
                     return
 
     def display_tokens(self, tokens):
@@ -110,6 +106,19 @@ class MainApp:
             else:
                 messagebox.showinfo(
                     "Información", "No hay un AST para mostrar. Por favor, cargue un archivo JavaScript primero.")
+
+
+    def run_semantic_analysis(self):
+        if self.file_path:
+            semantic_errors = analyze_semantics(self.file_path)
+            if semantic_errors:
+                error_message = "\n".join(semantic_errors)
+                messagebox.showerror("Errores Semánticos", error_message)
+            else:
+                messagebox.showinfo("Análisis Semántico", "No se encontraron errores semánticos.")
+        else:
+            messagebox.showinfo(
+                "Información", "No hay un archivo cargado para analizar. Por favor, cargue un archivo JavaScript primero.")
 
 
 if __name__ == "__main__":

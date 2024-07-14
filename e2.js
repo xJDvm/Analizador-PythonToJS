@@ -1,8 +1,7 @@
 console.log(f);
-const b = 1;
+const a = 1;
 const b = 2;
-const c = 5;
-c = 0;
+const b = 5;
 // hola
 /* 
 EEE
