@@ -3,7 +3,7 @@ from tkinter import filedialog, ttk, messagebox, Toplevel
 from lexer import Lexer
 import esprima
 import json
-from semantics import analyze_semantics  # Importa la función del archivo semantics.py
+from semantics import analyze_semantics 
 import subprocess
 import sys
 
@@ -18,7 +18,7 @@ class MainApp:
         self.create_widgets()
         self.ast = None
         self.syntax_error = ""
-        self.file_path = None  # Variable para almacenar la ruta del archivo
+        self.file_path = None  
 
     def create_widgets(self):
         self.frame = tk.Frame(self.root, bg="#D9D9D9", padx=10, pady=10)
@@ -100,7 +100,6 @@ class MainApp:
         self.clear_table()
         self.ast = None
         self.syntax_error = ""
-        # Aquí puedes agregar más variables que necesites limpiar
 
     def show_ast(self):
         if self.ast:
