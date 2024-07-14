@@ -4,6 +4,9 @@ from lexer import Lexer
 import esprima
 import json
 from semantics import analyze_semantics  # Importa la función del archivo semantics.py
+import subprocess
+import sys
+python_executable = sys.executable
 
 
 
@@ -11,7 +14,7 @@ class MainApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Analizador Léxico y sintáctico de JavaScript")
-        self.root.geometry("800x600")
+        self.root.geometry("1280x800")
         self.root.configure(bg="#D9D9D9")
         self.create_widgets()
         self.ast = None
@@ -66,10 +69,15 @@ class MainApp:
             "Consolas", 12, "bold"), bg="#1C5560", fg="#D9D9D9", bd=0, padx=5, pady=5)
         self.semantic_analysis_button.grid(row=0, column=3, padx=20)
 
+        self.compile_button = tk.Button(self.button_frame, text="Compilar JavaScript", command=self.compile_javascript, font=(
+            "Consolas", 12, "bold"), bg="#1C5560", fg="#D9D9D9", bd=0, padx=5, pady=5)
+        self.compile_button.grid(row=0, column=4, padx=20)
+
     def load_file(self):
         self.file_path = filedialog.askopenfilename(
             filetypes=[("JavaScript Files", "*.js")])
         if self.file_path:
+            self.clear_table()
             with open(self.file_path, 'r') as file:
                 code = file.read()
                 lexer = Lexer(code)
@@ -82,7 +90,6 @@ class MainApp:
                     return
 
     def display_tokens(self, tokens):
-        self.clear_table()
         for token in tokens:
             self.tree.insert("", "end", values=(token.value, token.type))
 
@@ -107,7 +114,6 @@ class MainApp:
                 messagebox.showinfo(
                     "Información", "No hay un AST para mostrar. Por favor, cargue un archivo JavaScript primero.")
 
-
     def run_semantic_analysis(self):
         if self.file_path:
             semantic_errors = analyze_semantics(self.file_path)
@@ -120,6 +126,16 @@ class MainApp:
             messagebox.showinfo(
                 "Información", "No hay un archivo cargado para analizar. Por favor, cargue un archivo JavaScript primero.")
 
+    def compile_javascript(self):
+        if self.file_path:
+            try:
+                result = subprocess.check_output([python_executable, 'compiler.py', self.file_path], stderr=subprocess.STDOUT, universal_newlines=True)
+                messagebox.showinfo("Resultado de compilación", result.strip())
+            except subprocess.CalledProcessError as e:
+                messagebox.showerror("Error de compilación", e.output.strip())
+        else:
+            messagebox.showinfo(
+                "Información", "No hay un archivo cargado para compilar. Por favor, cargue un archivo JavaScript primero.")
 
 if __name__ == "__main__":
     root = tk.Tk()

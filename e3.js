@@ -1,5 +1,7 @@
-function greet(name) {
-    return "Hello, " + name;
+function sumar(a, b) {
+    return a + b;
 }
-let userName = "Alice";
-console.log(greet(userName));	
+
+// Ejemplo de uso
+var resultado = sumar(5, 3);
+resultado;
