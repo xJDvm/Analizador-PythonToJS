@@ -6,9 +6,8 @@ import json
 from semantics import analyze_semantics  # Importa la función del archivo semantics.py
 import subprocess
 import sys
+
 python_executable = sys.executable
-
-
 
 class MainApp:
     def __init__(self, root):
@@ -36,7 +35,7 @@ class MainApp:
             "Consolas", 12, "bold"), bg="#1C5560", fg="#D9D9D9", bd=0, padx=5, pady=5)
         self.upload_button.grid(row=0, column=0, padx=0)
 
-        self.clear_button = tk.Button(self.button_frame, text="Limpiar", command=self.clear_table, font=(
+        self.clear_button = tk.Button(self.button_frame, text="Limpiar", command=self.clear_data, font=(
             "Consolas", 12, "bold"), bg="#1C5560", fg="#D9D9D9", bd=0, padx=27, pady=5)
         self.clear_button.grid(row=0, column=1, padx=20)
 
@@ -77,7 +76,7 @@ class MainApp:
         self.file_path = filedialog.askopenfilename(
             filetypes=[("JavaScript Files", "*.js")])
         if self.file_path:
-            self.clear_table()
+            self.clear_data()
             with open(self.file_path, 'r') as file:
                 code = file.read()
                 lexer = Lexer(code)
@@ -96,6 +95,12 @@ class MainApp:
     def clear_table(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
+
+    def clear_data(self):
+        self.clear_table()
+        self.ast = None
+        self.syntax_error = ""
+        # Aquí puedes agregar más variables que necesites limpiar
 
     def show_ast(self):
         if self.ast:

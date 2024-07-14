@@ -22,7 +22,8 @@ Este proyecto implementa un analizador léxico y un analizador sintáctico para 
        `sudo apt-get update`
        `sudo apt-get install python3-tk`
        `pip install esprima`
-
+       `pip install py_mini_racer`
+      
    
 4. **Ejecutar:**
    `python main.py`
