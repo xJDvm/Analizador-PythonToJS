@@ -3,11 +3,12 @@ from tkinter import filedialog, ttk, messagebox, Toplevel
 from lexer import Lexer
 import esprima
 import json
-from semantics import analyze_semantics 
+from semantics import analyze_semantics
 import subprocess
 import sys
 
 python_executable = sys.executable
+
 
 class MainApp:
     def __init__(self, root):
@@ -18,13 +19,15 @@ class MainApp:
         self.create_widgets()
         self.ast = None
         self.syntax_error = ""
-        self.file_path = None  
+        self.semantic_error = ""
+        self.result = ""
+        self.file_path = None
 
     def create_widgets(self):
         self.frame = tk.Frame(self.root, bg="#D9D9D9", padx=10, pady=10)
         self.frame.pack(fill=tk.BOTH, expand=True)
 
-        self.title_label = tk.Label(self.frame, text="Analizador Léxico y sintáctico de JavaScript", font=(
+        self.title_label = tk.Label(self.frame, text="Traductor de Javascript a Python", font=(
             "Consolas", 16, "bold"), bg="#D9D9D9", fg="#001F36")
         self.title_label.pack(pady=10)
 
@@ -76,7 +79,6 @@ class MainApp:
         self.file_path = filedialog.askopenfilename(
             filetypes=[("JavaScript Files", "*.js")])
         if self.file_path:
-            self.clear_data()
             with open(self.file_path, 'r') as file:
                 code = file.read()
                 lexer = Lexer(code)
@@ -100,6 +102,9 @@ class MainApp:
         self.clear_table()
         self.ast = None
         self.syntax_error = ""
+        self.semantic_error = None
+        self.result = None
+        self.file_path = None
 
     def show_ast(self):
         if self.ast:
@@ -120,12 +125,13 @@ class MainApp:
 
     def run_semantic_analysis(self):
         if self.file_path:
-            semantic_errors = analyze_semantics(self.file_path)
-            if semantic_errors:
-                error_message = "\n".join(semantic_errors)
+            self.semantic_error = analyze_semantics(self.file_path)
+            if self.semantic_error:
+                error_message = "\n".join(self.semantic_error)
                 messagebox.showerror("Errores Semánticos", error_message)
             else:
-                messagebox.showinfo("Análisis Semántico", "No se encontraron errores semánticos.")
+                messagebox.showinfo("Análisis Semántico",
+                                    "No se encontraron errores semánticos.")
         else:
             messagebox.showinfo(
                 "Información", "No hay un archivo cargado para analizar. Por favor, cargue un archivo JavaScript primero.")
@@ -133,13 +139,16 @@ class MainApp:
     def compile_javascript(self):
         if self.file_path:
             try:
-                result = subprocess.check_output([python_executable, 'compiler.py', self.file_path], stderr=subprocess.STDOUT, universal_newlines=True)
-                messagebox.showinfo("Resultado de compilación", result.strip())
+                self.result = subprocess.check_output(
+                    [python_executable, 'compiler.py', self.file_path], stderr=subprocess.STDOUT, universal_newlines=True)
+                messagebox.showinfo(
+                    "Resultado de compilación", self.result.strip())
             except subprocess.CalledProcessError as e:
                 messagebox.showerror("Error de compilación", e.output.strip())
         else:
             messagebox.showinfo(
                 "Información", "No hay un archivo cargado para compilar. Por favor, cargue un archivo JavaScript primero.")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
