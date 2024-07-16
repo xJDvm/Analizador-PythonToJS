@@ -79,6 +79,7 @@ class MainApp:
         self.file_path = filedialog.askopenfilename(
             filetypes=[("JavaScript Files", "*.js")])
         if self.file_path:
+            self.clear_table()
             with open(self.file_path, 'r') as file:
                 code = file.read()
                 lexer = Lexer(code)
