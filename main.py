@@ -140,8 +140,10 @@ class MainApp:
     def compile_javascript(self):
         if self.file_path:
             try:
-                output = subprocess.check_output([python_executable, 'compiler.py', self.file_path], stderr=subprocess.STDOUT, universal_newlines=True)
-                result, translated_code = output.split("===")
+                result = subprocess.check_output([python_executable, 'compiler.py', self.file_path], stderr=subprocess.STDOUT, universal_newlines=True)
+                with open(self.file_path, 'r') as file:
+                    js_code = file.read()
+                translated_code = subprocess.check_output([python_executable, 'translator.py', self.file_path], universal_newlines=True)
                 self.show_compilation_result(result.strip(), translated_code.strip())
             except subprocess.CalledProcessError as e:
                 messagebox.showerror("Error de compilación", e.output.strip())
@@ -152,21 +154,21 @@ class MainApp:
     def show_compilation_result(self, result, translated_code):
         result_window = Toplevel(self.root)
         result_window.title("Resultado de Compilación")
-        result_window.geometry("600x400")
+        result_window.geometry("600x400")  # Ajustar el tamaño de la ventana
+        
+        result_label = tk.Label(result_window, text="Resultado:", font=("Consolas", 12, "bold"))
+        result_label.pack(pady=5)
 
-        result_label = tk.Label(result_window, text="Resultado de la Ejecución:", font=("Consolas", 12, "bold"))
-        result_label.pack(pady=10)
-
-        result_text = tk.Text(result_window, wrap="word", height=3)
-        result_text.pack(expand=True, fill="both", padx=10, pady=10)
+        result_text = tk.Text(result_window, wrap="word", height=5)
+        result_text.pack(expand=True, fill="both", padx=10, pady=5)
         result_text.insert("1.0", result)
         result_text.config(state=tk.DISABLED)
 
         translated_code_label = tk.Label(result_window, text="Código Traducido:", font=("Consolas", 12, "bold"))
-        translated_code_label.pack(pady=10)
+        translated_code_label.pack(pady=5)
 
-        translated_code_text = tk.Text(result_window, wrap="word")
-        translated_code_text.pack(expand=True, fill="both", padx=10, pady=10)
+        translated_code_text = tk.Text(result_window, wrap="word", height=5)
+        translated_code_text.pack(expand=True, fill="both", padx=10, pady=5)
         translated_code_text.insert("1.0", translated_code)
         translated_code_text.config(state=tk.DISABLED)
         
